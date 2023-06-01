@@ -1,0 +1,92 @@
+{% extends "Booking_System/layout.html" %}
+{% block title %}
+Book Specific Dates
+{% endblock %}
+
+{% block content %}
+
+    {% if messages %}
+    <div class="messages">
+        {% for message in messages %}
+            <div class="alert {{ message.tags }}">
+                <span class="closebtn" onclick="this.parentElement.style.display='none';">&times;</span> 
+                <strong>{{ message }}</strong>
+            </div>
+        {% endfor %}
+    </div>
+    {% endif %}
+    
+    <div class="container ">
+        <h2>Cinema Booking</h2>
+        <div class="date-picker-container">
+            <label for="date-picker">Select a date:</label>
+            <input type="date" id="date-picker" name="selected_date" value="{{ selected_date|date:'Y-m-d' }}" onchange="filterFilms()" />
+        </div>
+        
+        <br>
+        
+        <table class="showing-table">
+            <thead>
+            <tr>
+                <th id="title-row" colspan="7">{{ title }} </th>
+            </tr>
+            </thead>
+            <tbody>
+            {% if screens %}
+            {% for screen in screens %}
+            <tr>
+                <td colspan="4">Screen {{ screen.screen_number }}</td>
+            </tr>
+            {% if screen.show_times.exists %}
+                <td>
+                    <div class="film-info">
+                        <div class="film-image-title">
+                            <div class="film-title">{{ screen.show_times.first.film.title }}</div>
+                            <img class="now-showing-img" src="{{ screen.show_times.first.film.image.url }}" alt="{{ screen.show_times.first.film.title }} Image">
+                        </div>
+                        <div class="film-details">
+                            <p><strong>Age Rating:</strong> {{ screen.show_times.first.film.age_rating }}</p>
+                            <p><strong>Duration:</strong> {{ screen.show_times.first.film.duration }} minutes</p>
+                            <p><strong>Description:</strong> {{ screen.show_times.first.film.description }}</p>
+                       
+                        </div>
+                        <div class="showing-times">
+                            <ul class="list-group">
+                            {% for show_time in screen.show_times.all %}
+                                {% if show_time.start_time|date:"Y-m-d" == selected_date|date:"Y-m-d" %}
+                                <li class="list-group-item text-dark">
+                                {{ show_time.start_time|date:"l" }}:
+                                <span  class="time-box"><a href="{% url 'ticket_selection_booking' show_time.id %}" style="text-decoration:none;color:white;">
+                                    {{ show_time.start_time|date:"H:i A" }} </a></span>
+                                </li>
+                                {% endif %}
+                            {% endfor %}
+                            </ul>
+                        </div>
+                    </div>
+                </td>
+            {% else %}
+                <td colspan="2">No showing on this screen.</td>
+            {% endif %}
+        {% endfor %}
+            {% else %}
+                <tr>
+                    <td colspan="4">No showing today.</td>
+                </tr>
+            {% endif %} 
+            </tbody>
+        </table>
+    </div>
+        
+        <script>
+            function filterFilms() {
+                let datePicker = document.getElementById("date-picker");
+                let selectedDate = datePicker.value;
+                window.location.href = "?selected_date=" + selectedDate;
+            }
+        </script>
+    </div>
+
+
+   
+{% endblock %}

@@ -1,0 +1,80 @@
+{% extends "Booking_System/layout.html" %}
+
+{% block title %}
+Log In
+{% endblock %}
+
+{% block content %}
+    
+    <div class="container">
+        <h2>Login</h2>
+        <div class="login-toggle">
+            <button class="toggle-btn active" onclick="toggleLogin('user')">User</button>
+            <button class="toggle-btn" onclick="toggleLogin('club', this)" label="Club">Club</button> 
+
+        </div>
+
+        <div id="user-login">
+            <form method="post">
+                {% csrf_token %}
+                {{ form.username.label_tag }} {{ form.username }}
+                {% if form.username.errors %}
+                    <p>{{ form.username.errors.0 }}</p>
+                {% endif %}
+                {{ form.password.label_tag }} {{ form.password }}
+                {% if form.password.errors %}
+                    <p>{{ form.password.errors.0 }}</p>
+                {% endif %}
+                <button class="enter_button" type="submit" name="student_login">Login</button>
+                
+            </form>
+        </div>
+
+        <div id="club-login" class="show-club-login" style="display:none;">
+            <form method="post" id="club-form">
+                {% csrf_token %}
+                <label for="{{ club_form.username.id_for_label }}">Club Representative Number:</label>
+                {{ club_form.username }}
+                {% if club_form.username.errors %}
+                    <p>{{ club_form.username.errors.0 }}</p>
+                {% endif %}
+                    {{ club_form.password.label_tag }} {{ club_form.password }}
+                {% if club_form.password.errors %}
+                    <p>{{ club_form.password.errors.0 }}</p>
+                {% endif %}
+                <button class="enter_button" type="submit" name="club_rep_login">Login</button>
+
+            </form>
+        </div> 
+
+        {% if messages %}
+            <div class="messages">
+                {% for message in messages %}
+                    <div class="{{ message.tags }}" style="color: red;">{{ message }}</div>
+                {% endfor %}
+            </div>
+        {% endif %} 
+
+
+        <br>
+    </div>
+
+    <script>
+        function toggleLogin(type) {
+            if (type === 'club') {
+                document.getElementById('user-login').style.display = 'none';
+                document.getElementById('club-login').style.display = 'block';
+                document.querySelector('.login-toggle .active').classList.remove('active');
+                document.querySelector('.login-toggle button:nth-child(2)').classList.add('active');
+                document.body.classList.add('show-club-login');
+            } else {
+                document.getElementById('user-login').style.display = 'block';
+                document.getElementById('club-login').style.display = 'none';
+                document.querySelector('.login-toggle .active').classList.remove('active');
+                document.querySelector('.login-toggle button:nth-child(1)').classList.add('active');
+                document.body.classList.remove('show-club-login');
+            }
+        }
+    </script>
+    
+{% endblock %}

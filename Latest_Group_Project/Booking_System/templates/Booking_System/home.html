@@ -1,0 +1,70 @@
+{% extends "Booking_System/layout.html" %}
+{% block title %}
+Home
+{% endblock %}
+
+{% block content %}
+
+    {% if messages %}
+    <div class="messages">
+        {% for message in messages %}
+            <div class="alert {{ message.tags }}">
+                <span class="closebtn" onclick="this.parentElement.style.display='none';">&times;</span> 
+                <strong>{{ message }}</strong>
+            </div>
+        {% endfor %}
+    </div>
+    {% endif %}
+
+
+    <div class="slide-frame">
+        <div class="slideshow">
+        <div class="image-container">
+            {% for image in film_images %}
+            <img src="{{ image.url }}" class="d-block w-100" alt="{{ image.title }} Image">
+            {% endfor %}
+            {% for image in film_images %}
+            <img src="{{ image.url }}" class="d-block w-100" alt="{{ image.title }} Image">
+            {% endfor %}
+        </div>
+        </div>
+    </div>
+    
+    <div class="film-container ">
+        <div class="row">
+            {% for film in now_showing_films %}
+            <div class="col-md-4">
+                <div class="card mb-4 box-shadow border">
+                    {% if film.image %}
+                    <img class="card-img-top image-size" src="{{ film.image.url }}" alt="{{ film.title }} Image">
+                    {% else %}
+                    {% load static %}
+                    <img class="card-img-top image-size" src="{% static 'img/default.png' %}" alt="{{ film.title }} Image">
+                    {% endif %}
+                    <div class="card-body image-size">
+                        <h3 class="card-title font-weight-bold">{{ film.title }}</h3>
+                        <p class="card-text font-weight-bold"><strong>Description:</strong> {{ film.description }}</p>
+                        <p class="card-text font-weight-bold"><strong>Cast: </strong>{{ film.cast.all|join:', ' }}</p>
+                        <p class="card-text font-weight-bold"><strong>Director: </strong>{{ film.directors.all|join:', ' }}</p>
+                        <p class="card-text font-weight-bold"><strong>Age Rating:</strong> {{ film.age_rating }}</p>
+                        <p class="card-text font-weight-bold"><strong>Available Time:</strong></p>
+                        <ul class="list-group list-group-flush text-dark">
+                            
+                            {% for show_time in film.showtime_set.all|dictsort:"start_time"|slice:":2" %}
+                                {% if show_time %}
+                                    <li class="list-group-item text-dark">{{ show_time.start_time|date:"l" }}:
+                                        <span class="time-box"><a href="{% url 'ticket_selection_booking' showtime_id=show_time.id %}" style="text-decoration:none;color:white;">
+                                            {{ show_time.start_time|date:"H:i A" }} </a></span></li>
+                                {% else %}
+                                    <span class="time-box"><p style = "color:black;">No Showing Available</p></span></li>
+                                {% endif %}
+                            {% endfor %}
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+
+{% endblock %}

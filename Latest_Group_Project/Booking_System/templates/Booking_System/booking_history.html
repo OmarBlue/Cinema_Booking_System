@@ -1,0 +1,51 @@
+{% extends "Booking_System/layout.html" %}
+{% block title %}
+Booking History
+{% endblock %}
+
+{% block content %}
+
+  {% if messages %}
+  <div class="messages">
+      {% for message in messages %}
+          <div class="alert {{ message.tags }}">
+              <span class="closebtn" onclick="this.parentElement.style.display='none';">&times;</span> 
+              <strong>{{ message }}</strong>
+          </div>
+      {% endfor %}
+  </div>
+  {% endif %}
+
+  <div class="container">
+      <h1>Booking History</h1>
+      <table>
+        <thead>
+          <tr>
+            <th>Booking Number</th>
+            <th>Film</th>
+            <th>Screen</th>
+            <th>Seat</th>
+            <th>Student</th>
+            <th>Date Booked</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% if bookings %}
+              {% for booking in bookings %}
+              <tr>
+                  <td>{{ booking.booking_number }}</td>
+                  <td>{{ booking.film }}</td>
+                  <td>{{ booking.screen }}</td>
+                  <td>{{ booking.seat }}</td>
+                  <td>{{ booking.student }}</td>
+                  <td>{{ booking.date_booked }}</td>
+              </tr>
+              {% endfor %}
+          {% else %}
+              <td>No Bookings Found.</td>
+          {% endif %}
+        </tbody>
+      </table>
+  </div>
+
+{% endblock %}

@@ -1,0 +1,32 @@
+{% extends "Booking_System/layout.html" %}
+{% block title %}
+Create Account
+{% endblock %}
+
+{% block content %}
+
+    {% if messages %}
+    <div class="messages">
+        {% for message in messages %}
+            <div class="alert {{ message.tags }}">
+                <span class="closebtn" onclick="this.parentElement.style.display='none';">&times;</span> 
+                <strong>{{ message }}</strong>
+            </div>
+        {% endfor %}
+    </div>
+    {% endif %}
+
+    <div class="container">
+
+        <h2>Creating a New Statement Account</h2>
+        <form method="post">
+            {% csrf_token %}
+            {{ form.as_p }}
+            <h2>Payment Card Details:</h2>
+            {{ payment_form.as_p }}
+            <button  class="enter_button" type="submit">Create Statement Account</button>
+        </form>
+
+    </div>
+    
+{% endblock %}

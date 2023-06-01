@@ -1,0 +1,54 @@
+{% extends "Booking_System/layout.html" %}
+{% block title %}
+Manage Screen
+{% endblock %}
+
+{% block content %}
+{% if messages %}
+<div class="messages">
+    {% for message in messages %}
+        <div class="alert {{ message.tags }}">
+            <span class="closebtn" onclick="this.parentElement.style.display='none';">&times;</span> 
+            <strong>{{ message }}</strong>
+        </div>
+    {% endfor %}
+</div>
+{% endif %}
+
+    <div class="container">
+        <h2>Manage Screen</h2>
+        <form method="post">
+            {% csrf_token %}
+            {{ form.as_p }}
+            <button type="submit" class="btn btn-primary">Add Screen</button>
+        </form>
+        <br>
+        <table class="table table-striped">
+            <thead>
+                <tr>
+                    <th>Screen Number</th>
+                    <th>Seats</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% if screens %}
+                    {% for screen in screens %}
+                        <tr>
+                            <td>{{ screen.screen_number }}</td>
+                            <td>{{ screen.seats }}</td>
+                            <td>
+                                <a href="{% url 'edit_screen' screen.id  %}" class="btn btn-primary">Edit</a>
+                                <a href="{% url 'delete_screen' screen.id  %}" class="btn btn-danger">Delete</a>
+                            </td>
+                        </tr>
+                    {% endfor %}
+                {% else %}
+                    <td colspan="7">You have currently no screens recorded.</td>
+                {% endif %}
+            </tbody>
+        </table>
+        
+    </div>
+    
+{% endblock %}

@@ -1,0 +1,70 @@
+from django.urls import path
+from . import views
+from django.conf import settings
+from django.conf.urls.static import static
+from .views import *
+from django.urls import path, include
+from django.contrib.auth.views import LoginView
+
+urlpatterns = [
+    path("", views.home, name="home"),
+    path("login_view/", views.login_view, name="login_view"),
+    path("register_student/", views.register_student, name="register_student"),
+    path("logout_view/", views.logout_view, name="logout_view"),
+    path("create_manager/", views.create_manager, name="create_manager"),
+    path("add_film/", views.add_film, name="add_film"),
+    path("edit_film/<int:film_id>", views.edit_film, name="edit_film"),
+    path("display_film/", views.display_film, name="display_film"),
+    path('add_showtime/', views.add_showtime, name='add_showtime'),
+    path('delete_finished_showtimes/', views.delete_finished_showtimes, name='delete_finished_showtimes'),
+    path('showtime/<int:showing_id>/remove_showing/', views.remove_showing, name='remove_showing'),
+    path('now_showing/', views.now_showing, name='now_showing'),
+    path('book_specific_dates/', views.book_specific_dates, name='book_specific_dates'),
+    path('manage_booking/', views.manage_booking, name='manage_booking'),
+    path('manage_student_account/', views.manage_student_account, name='manage_student_account'),
+    path('manage_screen/', views.manage_screen, name='manage_screen'),
+    path('manage_showing/', views.manage_showing, name='manage_showing'),
+    path('film/<int:film_id>/remove_showing/', views.remove_showing, name='remove_showing'),
+    path('view_all_account/', views.view_all_account, name='view_all_account'),
+    path('edit_account/<int:student_id>/', views.edit_account, name='edit_account'),
+    path('delete_account/<int:student_id>/', views.delete_account, name='delete_account'),
+    path('edit_screen/<int:screen_id>/', views.edit_screen, name='edit_screen'),
+    path('edit_showing/<int:showing_id>/', views.edit_showing, name='edit_showing'),
+    path('delete_screen/<int:screen_id>/', views.delete_screen, name='delete_screen'),
+    path('delete_showing/<int:showing_id>/', views.delete_showing, name='delete_showing'),
+    path('film/<int:film_id>/delete/', views.delete_film, name='delete_film'),
+    path('topup/', views.topup, name='topup'),
+    path('search_film/', views.search_film, name='search_film'),
+    path('add_film_api/', views.add_film_api, name='add_film_api'),
+    path('provide_discount/<int:student_id>/', views.provide_discount, name='provide_discount'),
+    path('remove_discount/<int:student_id>/', views.remove_discount, name='remove_discount'),
+    path('booking_history/', views.booking_history, name='booking_history'),
+    path('register_club/', views.register_club, name='register_club'),
+    path('display_all_clubs/', views.display_all_clubs, name='display_all_clubs'),
+    path('create_statement_account/', views.create_statement_account, name='create_statement_account'),
+    path('request_statement_account/', views.request_statement_account, name='request_statement_account'),
+    path('account_statement/', views.account_statement, name='account_statement'),
+    path('ticket_selection_booking/<int:showtime_id>/', views.ticket_selection_booking, name='ticket_selection_booking'),
+    path('edit_account_statement/<uuid:account_id>/', views.edit_account_statement, name='edit_account_statement'),
+    path('delete_statement_account/<uuid:account_id>/', views.delete_statement_account, name='delete_statement_account'),
+    path('accounts/login/', LoginView.as_view(template_name='Booking_System/login.html'), name='login'),
+    path('pending_students_registrations/', views.pending_students_registrations, name='pending_students_registrations'),
+    path('pending_statement_account/', views.pending_statement_account, name='pending_statement_account'),
+    path('approve_student/<int:user_id>/', views.approve_student, name='approve_student'),
+    path('decline_student/<int:user_id>/', views.decline_student, name='decline_student'),
+    path('pending_club_registrations/', views.pending_club_registrations, name='pending_club_registrations'),
+    path('approve_club_registration/<int:club_rep_id>/', views.approve_club_registration, name='approve_club_registration'),
+    path('decline_club_registration/<int:club_rep_id>/', views.decline_club_registration, name='decline_club_registration'),
+    path('statement_request /<int:request_id>/delete/', views.finish_statement_request, name='finish_statement_request'),
+    path('register_tabs/', views.register_tabs, name='register_tabs'),
+    path('receipt/<int:booking_id>/', views.receipt, name='receipt'),
+    path('confirm_booking/', views.confirm_booking, name='confirm_booking'),
+    path('save_seat_selection/<int:booking_id>/', views.save_seat_selection, name='save_seat_selection'),
+    path('cancel_booking/<int:booking_id>/', views.cancel_booking, name='cancel_booking'),
+    path('monthly_account_statement/', views.monthly_account_statement, name='monthly_account_statement'),
+    path('month_select/', views.month_select, name='month_select'),
+    path('view_monthly_statement_manager/<uuid:account_id>/', views.view_monthly_statement_manager, name='view_monthly_statement_manager'),
+]+ static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+
+if settings.DEBUG:
+    urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

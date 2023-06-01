@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8"/>
+    <title>{% block title %}{% endblock %}</title>
+     <meta name="viewport" content="width=device-width, initial-scale=1">  
+    {% load static %}
+    <link rel="stylesheet" type="text/css" href="{% static 'Booking_System/site.css' %}"/>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css">  
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css" />
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
+
+    
+    <script>
+        $(document).ready(function() {
+            $('.nav li').click(function() {
+                $('.nav li').removeClass('active');
+                $(this).addClass('active');
+            });
+    
+            // remove active class from all links in navbar when a new page is loaded
+            $('.nav li').removeClass('active');
+            var currentPath = window.location.pathname;
+            $('.nav li a[href="'+currentPath+'"]').parent().addClass('active');
+        });
+
+    </script>
+</head>
+
+<body>
+    <nav class="navbar navbar-inverse nav-height top-navbar">
+        <div class="container-fluid">
+            <div class="navbar-header">
+                <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar-collapse">
+                    <span class="sr-only">Toggle navigation</span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                </button>
+                <a class="navbar-brand uwe-flix" href="{% url 'home' %}">UWEFlix</a>
+            </div>
+            
+            <div class="collapse navbar-collapse" id="navbar-collapse">
+                <ul class="nav navbar-nav">
+                    <li class="active"><a href="{% url 'home' %}">All Films</a></li>
+                    <li><a href="{% url 'now_showing' %}">Now Showing</a></li>
+                    <li><a href="{% url 'book_specific_dates' %}">Book Specific Dates</a></li>
+                    {% if request.user.user_type == 1 or 0 %}
+                        <li><a href="{% url 'display_film' %}">Manage Films Showing</a></li>
+                    {% elif request.user.user_type == 0 %}
+                        <li><a href="{% url 'create_manager' %}">Create Manager Account</a></li>
+                    {% endif %}
+                </ul>
+
+           
+            <div class="right-container">
+                <form class="search-form" role="search">
+                    {% if request.user.user_type == 0 %}
+                        <div class="no-search-bar"> 
+                            <p class="welcome">Welcome, Super User {{ request.user.username}}!</p>
+                        </div>
+                    {% elif request.user.user_type == 1 %}
+                        <div class="no-search-bar">  
+                            <p class="welcome">Welcome, Cinema Manager {{ request.user.username}}!</p>
+                        </div>
+                    {% elif request.user.user_type == 2%}
+                        <div class="no-search-bar">
+                            <p class="welcome">Welcome, Account Manager {{ request.user.username}}!</p>
+                        </div>
+                    {% elif request.user.user_type == 3%}
+                    <div class="no-search-bar">
+                        <p class="welcome">Welcome, Student  {{ request.user.username}}!</p>
+                    </div>
+                    {% elif request.user.user_type == 4%}
+                    <div class="no-search-bar">
+                        <p class="welcome">Welcome, Club Representative  {{ request.user.username}} !</p>
+                    </div>
+                    {% else %}
+                        <div class="no-search-bar">
+                            <p class="welcome">Welcome, Guest!</p>
+                        </div>
+                    {% endif %}
+                   
+                </form>
+             
+                {% if user.is_authenticated %}
+                    <script>
+                        const logoutURL = "{% url 'home' %}?auto_logout=1";
+                        let logoutTimer;
+                    
+                        function resetTimer() {
+                            clearTimeout(logoutTimer);
+                            logoutTimer = setTimeout(() => {
+                                window.location.href = logoutURL;
+                            }, 1200000); 
+                        }
+                    
+                        window.onload = resetTimer;
+                        document.onmousemove = resetTimer;
+                        document.onkeypress = resetTimer;
+                    </script>
+
+                    <div class="user-container">
+                        <button class="dropdown-btn">
+                            <img src="{% static 'Booking_System/default_avatar.jpg' %}" alt="User Default" class="user-default">
+                        </button>
+                        <div class="dropdown-content">
+                            {% if request.user.user_type == 0 %}
+                                <a style="text-decoration:none;" href="{% url 'add_film' %}">Add Film</a>
+                                <a style="text-decoration:none;" href="{% url 'manage_screen' %}">Manage Screens</a>
+                                <a style="text-decoration:none;" href="{% url 'add_showtime' %}">Add Show Times</a>
+                                <a style="text-decoration:none;" href="{% url 'manage_showing' %}">Manage Showings</a>
+                                <a style="text-decoration:none;" href="{% url 'display_film' %}">Display Film</a>
+                                <a style="text-decoration:none;" href="{% url 'pending_students_registrations' %}">View Pending Students Registration Request</a>
+                                <a style="text-decoration:none;" href="{% url 'manage_student_account' %}">View Student Accounts</a>
+                                <a style="text-decoration:none;" href="{% url 'create_statement_account' %}">Create Statement Account</a>
+                                <a style="text-decoration:none;" href="{% url 'view_all_account' %}">View All Account</a>
+                                <a style="text-decoration:none;" href="{% url 'register_club' %}">Register a New club</a>
+                                <a style="text-decoration:none;" href="{% url 'display_all_clubs' %}">Display All Club</a>
+                            {% elif request.user.user_type == 1 %}
+                                <a style="text-decoration:none;" href="{% url 'add_film' %}">Add Film</a>
+                                <a style="text-decoration:none;" href="{% url 'manage_screen' %}">Manage Screens</a>
+                                <a style="text-decoration:none;" href="{% url 'add_showtime' %}">Add Show Times</a>
+                                <a style="text-decoration:none;" href="{% url 'manage_showing' %}">Manage Showings</a>
+                                <a style="text-decoration:none;" href="{% url 'display_film' %}">Display Film</a>
+                                <a style="text-decoration:none;" href="{% url 'pending_students_registrations' %}">View Pending Students Registration Request</a>
+                                <a style="text-decoration:none;" href="{% url 'pending_club_registrations' %}">View Pending Clubs Registration Request</a>
+                                <a style="text-decoration:none;" href="{% url 'manage_student_account' %}">Display All Student Accounts</a>
+                                <a style="text-decoration:none;" href="{% url 'display_all_clubs' %}">Display All Club</a>
+                            {% elif request.user.user_type == 2 %}
+                                <a style="text-decoration:none;" href="{% url 'pending_statement_account' %}">View Statement Accounts Request</a>
+                                <a style="text-decoration:none;" href="{% url 'create_statement_account' %}">Create Statement Account</a>
+                                <a style="text-decoration:none;" href="{% url 'view_all_account' %}">View All Statement Accounts</a>
+                            {% elif request.user.user_type == 3  %}
+                                {% with account=request.user.get_account %}
+                                    {% if account %}
+                                        <a style="text-decoration:none;" href="{% url 'topup' %}">Credit Left: £ {{ account.credit_left }}</a>
+                                    {% else %}
+                                        <a style="text-decoration:none;" href="{% url 'topup' %}">Credit Left: £ 0.00</a>
+                                        <a style="text-decoration:none;" href="{% url 'request_statement_account' %}">Request Statement Account</a>
+                                    {% endif %}
+                                {% endwith %}
+                                <a style="text-decoration:none;" href="{% url 'manage_booking' %}">Manage Booking</a>
+                                <a style="text-decoration:none;" href="{% url 'topup' %}">Top Up</a>
+                            {% elif request.user.user_type == 4  %}
+                                {% with account=request.user.get_account %}
+                                    {% if account %}
+                                        <a style="text-decoration:none;" href="{% url 'topup' %}">Credit Left: £ {{ account.credit_left }}</a>
+                                    {% else %}
+                                        <a style="text-decoration:none;" href="{% url 'topup' %}">Credit Left: £ 0.00</a>
+                                        <a style="text-decoration:none;" href="{% url 'request_statement_account' %}">Request Statement Account</a>
+                                    {% endif %}
+                                {% endwith %}
+                                <a style="text-decoration:none;" href="{% url 'manage_booking' %}">Manage Booking</a>
+                                <a style="text-decoration:none;" href="{% url 'topup' %}">Top Up</a>
+                                <a style="text-decoration:none;" href="{% url 'month_select' %}">View Monthly Statement</a>
+                            {% endif %}
+                            
+                            <a style="text-decoration:none;" class="divider" href="{% url 'logout_view' %}">Log out</a>
+                        </div>
+                    </div>
+                {% else %}
+                    <div class="buttons-container">
+                        <a class="login_container" href="{% url 'login_view' %}"><button type="button" class="login_button">Log In</button></a>
+                        <a class="login_container" href="{% url 'register_tabs' %}"><button type="button" class="login_button">Register</button></a>
+                    </div>
+                {% endif %}
+            </div>
+        </div>         
+    </nav>
+
+    <div class="body-content">
+        {% block content %}
+        {% endblock %}
+        <hr/>
+        <footer>
+            <p>&copy; Group 5 DESD Cinema Booking System, 2023</p>
+        </footer>
+    </div>
+
+    <script>
+        const dropdownBtn = document.querySelector('.dropdown-btn');
+        const dropdownContent = document.querySelector('.dropdown-content');
+        
+        dropdownBtn.addEventListener('click', function() {
+          if (dropdownContent.style.display === 'block') {
+            dropdownContent.style.display = 'none';
+          } 
+          else {
+            dropdownContent.style.display = 'block';
+          }
+        });
+
+        // Get the alert element
+        var alert = document.querySelector('.alert');
+
+        // If the alert element exists
+        if (alert) {
+        // Set a timeout to hide the alert after 5 seconds
+        setTimeout(function() {
+            alert.style.display = 'none';
+        }, 5000);
+
+        // A click event listener to the close button to hide the alert
+        var closeBtn = alert.querySelector('.closebtn');
+        closeBtn.addEventListener('click', function() {
+            alert.style.display = 'none';
+        });
+        }
+    </script>
+        
+
+</body>
+</html>

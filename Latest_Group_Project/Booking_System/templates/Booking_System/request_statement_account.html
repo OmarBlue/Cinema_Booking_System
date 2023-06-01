@@ -1,0 +1,55 @@
+{% extends "Booking_System/layout.html" %}
+{% block title %}
+Request Statement Account
+{% endblock %}
+
+{% block content %}
+
+    {% if messages %}
+    <div class="messages">
+        {% for message in messages %}
+            <div class="alert {{ message.tags }}">
+                <span class="closebtn" onclick="this.parentElement.style.display='none';">&times;</span> 
+                <strong>{{ message }}</strong>
+            </div>
+        {% endfor %}
+    </div>
+    {% endif %}
+
+    <div class="container">
+        <h3>Payment Details:</h3>
+        <form method="POST">
+            {% csrf_token %}
+            <div class="form-group">
+                <label for="cardholder_name">Cardholder Name:</label>
+                <input type="text" class="form-control" id="cardholder_name" name="cardholder_name" required>
+            </div>
+            <div class="form-group">
+                <label for="card_number">Card Number:</label>
+                <input type="text" class="form-control" id="card_number" name="card_number" required>
+                <div class="invalid-feedback">
+                    Please enter a valid card number.
+                </div>
+            </div>
+            <div class="form-row">
+                <div class="form-group col-md-6">
+                    <label for="expiration_date">Expiration Date:</label>
+                    <input type="text" class="form-control" id="expiration_date" name="expiration_date" placeholder="MM/YYYY" required>
+                    <div class="invalid-feedback">
+                        Please enter a valid expiration date (MM/YYYY).
+                    </div>
+                </div>
+                <div class="form-group col-md-6">
+                    <label for="cvv">CVV:</label>
+                    <input type="text" class="form-control" id="cvv" name="cvv" required>
+                    <div class="invalid-feedback">
+                        Please enter a valid CVV.
+                    </div>
+                </div>
+            </div>
+
+            <button type="submit" class="enter_button">Submit Request</button>
+        </form>
+    </div>
+
+{% endblock %}

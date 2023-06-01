@@ -1,0 +1,67 @@
+{% extends "Booking_System/layout.html" %}
+{% block title %}
+Manage Booking
+{% endblock %}
+
+{% block content %}
+
+    {% if messages %}
+    <div class="messages">
+        {% for message in messages %}
+            <div class="alert {{ message.tags }}">
+                <span class="closebtn" onclick="this.parentElement.style.display='none';">&times;</span> 
+                <strong>{{ message }}</strong>
+            </div>
+        {% endfor %}
+    </div>
+    {% endif %}
+
+    <div class="container">
+        <h2>My Bookings</h2>
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>Film</th>
+                        <th>Screen</th>
+                        <th>Date Booked</th>
+                        <th>Booking Number</th>
+                        <th>Showtime</th>
+                        <th>Tickets</th>
+                        <th>Amount</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% if user_bookings %}
+                        {% for booking in user_bookings %}
+                        <tr>
+                            <td>{{ booking.film }}</td>
+                            <td>{{ booking.screen }}</td>
+                            <td>{{ booking.date_booked }}</td>
+                            <td>{{ booking.booking_number }}</td>
+                            <td>{{ booking.showtime.start_time }} to {{ booking.showtime.end_time }}</td>
+                            <td>Student: {{ booking.student_tickets }} | Adult: {{ booking.adult_tickets }} | Senior: {{ booking.senior_tickets }}</td>
+                            <td> £ {{ booking.amount }}</td>
+                            <td>
+                                {% if booking.showtime.end_time > current_time %}
+                                    <form method="post" action="{% url 'cancel_booking' booking_id=booking.id %}">
+                                        {% csrf_token %}
+                                        <input type="hidden" name="is_seat_selection" value="True">
+                                        <button type="submit" class="btn btn-danger">
+                                            Cancel
+                                        </button>
+                                    </form>
+                                {% else %}
+                                    <span class="text-muted">Can't cancel</span>
+                                {% endif %}
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    {% else %}
+                        <td colspan="7">You have currently no bookings.</td>
+                    {% endif %}
+                </tbody>
+        </table>
+    </div>
+    
+{% endblock %}

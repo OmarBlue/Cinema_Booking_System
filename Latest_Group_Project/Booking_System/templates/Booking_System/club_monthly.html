@@ -1,0 +1,41 @@
+{% extends 'Booking_System/layout.html' %}
+
+{% block title %}
+Monthly Transactions
+{% endblock %}
+
+{% block content %}
+
+    <div class="container">
+        <h1>Account Statement for {{ month }}</h1>
+        <table class="table">
+            <thead>
+            <tr>
+                <th>Date</th>
+                <th>Film Booked</th>
+                <th>Ticket Quantity</th>
+                <th>Amount</th>
+                <th>Credit Balance</th>
+            </tr>
+            </thead>
+            <tbody>
+            {% for statement in statement_list %}
+                <tr>
+                <td>{{ statement.statement_date }}</td>
+                <td>{{ statement.film_name }}</td>
+                <td>{{ statement.ticket_quantity }}</td>
+                <td{% if statement.transaction_type == 'C' %} style="color: green;"{% else %} style="color: red;"{% endif %}>
+                {% if statement.transaction_type == 'C' %}+{% else %}-{% endif %} £{{ statement.amount }}
+                </td>
+                <td> £ {{ statement.credit_balance }}</td>
+                </tr>
+            {% empty %}
+                <tr>
+                <td colspan="5">No statement found for {{ month }}</td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+{% endblock %}

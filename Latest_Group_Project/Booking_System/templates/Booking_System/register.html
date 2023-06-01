@@ -1,0 +1,30 @@
+{% extends "Booking_System/layout.html" %}
+{% block title %}
+Register Page
+{% endblock %}
+
+{% block content %}
+<script>
+    $(function() {
+        $("#id_password2").keyup(function() {
+          var password = $("#id_password1").val();
+          var match = password == $(this).val();
+          var message = match ? "Passwords match." : "Passwords do not match!";
+          var match_color = match ? "green" : "red";
+          $("#PasswordMatch").html(message).css("color", match_color);
+        });
+    });
+</script>
+
+<div class="container">
+    <h1>Register</h1>
+    <form method="post">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <div class="registrationFormAlert" id="PasswordMatch"></div>
+
+        <button class="enter_button" type="submit">Request To Register</button>
+    </form>
+    
+</div>
+{% endblock %}

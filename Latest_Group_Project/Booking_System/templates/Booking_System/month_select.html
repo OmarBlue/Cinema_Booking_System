@@ -1,0 +1,87 @@
+{% extends 'Booking_System/layout.html' %}
+
+{% block title %}
+Select a Month
+{% endblock %}
+
+{% block content %}
+
+    {% if messages %}
+    <div class="messages">
+        {% for message in messages %}
+            <div class="alert {{ message.tags }}">
+                <span class="closebtn" onclick="this.parentElement.style.display='none';">&times;</span> 
+                <strong>{{ message }}</strong>
+            </div>
+        {% endfor %}
+    </div>
+    {% endif %}
+
+    {% if "club_uniq_num" in request.GET %}
+        <div class="alert alert-danger">
+            <span class="closebtn" onclick="this.parentElement.style.display='none';">&times;</span> 
+            <strong>Incorrect club representative number. Please try again.</strong>
+        </div>
+    {% endif %}
+
+    <div id="popup" style="display:none;">
+        <h2>Enter your club representative number:</h2>
+        <input type="text" name="club_rep_num" id="repnum-input">
+        <button class="enter_button" onclick="verifyRepNum()">Submit</button>
+    </div>
+
+    <div class="container small-container">
+        <h1>Select a month</h1>
+        <form method="POST" action="{% url 'monthly_account_statement' %}" id="month-select-form">
+            {% csrf_token %}
+            <label for="selected_month">Select a month:</label>
+            <select name="selected_month" id="selected_month">
+                <option value="01">January</option>
+                <option value="02">February</option>
+                <option value="03">March</option>
+                <option value="04">April</option>
+                <option value="05">May</option>
+                <option value="06">June</option>
+                <option value="07">July</option>
+                <option value="08">August</option>
+                <option value="09">September</option>
+                <option value="10">October</option>
+                <option value="11">November</option>
+                <option value="12">December</option>
+            </select>
+            <br>
+            <button class="small_enter_button" type="submit" onclick="showPopup(); return false;">View Monthly Statement</button>
+        </form>
+        
+    </div>
+
+    <script>
+        function showPopup() {
+            var popup = document.getElementById("popup");
+            var repnumInput = document.getElementById("repnum-input");
+            repnumInput.value = "";
+            popup.style.display = "block";
+            repnumInput.focus();
+        }
+
+        function hidePopup() {
+            document.getElementById("popup").style.display = "none";
+        }
+
+        function verifyRepNum() {
+            var repnumInput = document.getElementById("repnum-input");
+            var clubRepNum = "{{ request.user.username }}";
+            var enteredRepNum = repnumInput.value;
+            if (enteredRepNum === clubRepNum) {
+                // Submit the form to display the account statement
+                document.getElementById("month-select-form").submit();
+                hidePopup();
+            } else {
+                repnumInput.value = "";
+                repnumInput.focus();
+                window.location.href = "{% url 'month_select' %}?error=club_uniq_num";
+            }
+        }
+    </script>
+    
+{% endblock %}

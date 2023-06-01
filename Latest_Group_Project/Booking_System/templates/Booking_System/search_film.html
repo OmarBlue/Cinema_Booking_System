@@ -1,0 +1,45 @@
+{% extends "Booking_System/layout.html" %}
+{% block title %}
+Search Films
+{% endblock %}
+
+{% block content %}
+
+    {% if messages %}
+    <div class="messages">
+        {% for message in messages %}
+            <div class="alert {{ message.tags }}">
+                <span class="closebtn" onclick="this.parentElement.style.display='none';">&times;</span> 
+                <strong>{{ message }}</strong>
+            </div>
+        {% endfor %}
+    </div>
+    {% endif %}
+
+    <div class="container">
+        <h1>Search Films</h1>
+        <form method="GET" action="{% url 'search_film' %}">
+            <input type="text" name="query" placeholder="Search films..." value="{{ query }}" required>
+            <input type="submit" value="Search" class="btn btn-primary">
+        </form>
+        {% if film %}
+            <h2>{{ film.title }}</h2>
+            <img src="https://image.tmdb.org/t/p/w300{{ film.poster_path }}" alt="{{ film.title }}">
+            <p><strong>Release Date:</strong> {{ film.release_date }}</p>
+            <p><strong>Rating:</strong> {{ film.age_rating }}</p>
+            <p><strong>Director:</strong> {{ film.director }}</p>
+            <p><strong>Cast:</strong> {{ film.cast|join:", " }}</p>
+            <p>{{ film.description }}</p>
+            <form method="POST" action="{% url 'add_film_api' %}">
+                {% csrf_token %}
+                <input type="hidden" name="film_id" value="{{ film_id }}">
+                <input type="submit" value="Add to Database" class="btn btn-primary">
+            </form>
+        {% else %}
+            {% if query %}
+                <p>No films found for "{{ query }}".</p>
+            {% endif %}
+        {% endif %}
+    </div>
+    
+{% endblock %}

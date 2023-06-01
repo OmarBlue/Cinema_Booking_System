@@ -1,0 +1,30 @@
+version: '3.9'  # This is the Docker Compose file format version, not related to Dockerfile
+
+services:
+  web:
+    build: .
+    command: python manage.py runserver 0.0.0.0:8000
+    volumes:
+      - .:/app
+    ports:
+      - "8000:8000"
+    environment:  # Set environment variables for MySQL connection
+      MYSQL_HOST: db  # Use the service name 'db' instead of 'localhost'
+      MYSQL_PORT: 3306
+      MYSQL_DATABASE: DESD
+      MYSQL_USER: root
+      MYSQL_PASSWORD: password
+    depends_on:
+      - db
+
+  db:
+    image: "mysql:latest"
+    environment:
+      MYSQL_ROOT_PASSWORD: password
+      MYSQL_DATABASE: DESD
+    ports:
+      - "3306:3306"
+    networks:
+      default:
+        aliases:
+          - db

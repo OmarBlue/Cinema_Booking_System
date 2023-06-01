@@ -1,0 +1,258 @@
+{% extends "Booking_System/layout.html" %}
+{% block title %}
+Payment
+{% endblock %}
+
+{% block content %}
+
+<div class="container">
+      <h1>Seat Selection for Booking ID: {{ booking.id }}</h1>
+      <h2>Ticket Information:</h2>
+      <p>Student Tickets: <span id="studentTickets">{{ student_tickets }}</span></p>
+      <p>Adult Tickets: <span id="adultTickets">{{ adult_tickets }}</span></p>
+      <p>Senior Tickets: <span id="seniorTickets">{{ senior_tickets }}</span></p>
+
+      <form method="POST" action="{% url 'save_seat_selection' booking_id=booking.id %}">
+          {% csrf_token %}
+          <input type="hidden" name="total_tickets" value="{{ total_tickets }}">
+          <h1>Select Seats:</h1>
+
+          <div class="seat-grid">
+            <!-- Seat Buttons Here -->
+          </div>
+          <br>
+          <div class="screen">Screen</div>
+    
+          <input type="hidden" name="selected_seats" id="selected-seats">
+          <button type="submit" class="enter_button">Confirm Booking</button>
+          
+      </form>
+      <form method="post" action="{% url 'cancel_booking' booking_id=booking.id %}">
+        {% csrf_token %}
+        <button type="submit" class="cancel_button">Cancel</button>
+      </form>
+      
+          
+    
+  
+    {% if messages %}
+    <div class="messages">
+        {% for message in messages %}
+        {% if message.tags %}
+            <div class="{% if message.tags == 'error' %}alert alert-danger{% elif message.tags == 'success' %}alert alert-success{% endif %}">
+            {{ message }}
+            </div>
+        {% endif %}
+        {% endfor %}
+    </div>
+    {% endif %}
+
+    <script>
+        window.bookingId = {{ booking.id }};
+        window.csrf_token = '{{ csrf_token }}';
+        window.isConfirmingBooking = false;
+        window.screenSeats = {{ screen_seats }};
+    </script>
+
+    <script>
+        document.querySelector('.enter_button').addEventListener('click', function() {
+          window.isConfirmingBooking = true;
+        });
+
+        function getCookie(name) {
+          let cookieValue = null;
+          if (document.cookie && document.cookie !== '') {
+              const cookies = document.cookie.split(';');
+              for (let i = 0; i < cookies.length; i++) {
+                  const cookie = cookies[i].trim();
+                  // Does this cookie string begin with the name wanted?
+                  if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                      cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                      break;
+                  }
+              }
+          }
+          return cookieValue;
+        }
+      
+        window.addEventListener('beforeunload', function (e) {
+          if (!window.isConfirmingBooking) {
+              e.preventDefault();
+              e.returnValue = '';
+        
+              // Send an AJAX request to cancel the booking when the user leaves the page
+              const csrftoken = getCookie('csrftoken');
+              const xhr = new XMLHttpRequest();
+              xhr.open('POST', '/cancel_booking/' + window.bookingId + '/', true);
+              xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
+              xhr.setRequestHeader('X-CSRFToken', csrftoken);
+              xhr.send('csrfmiddlewaretoken=' + encodeURIComponent(csrftoken));
+          }
+        });
+      
+    </script>
+
+    <script>
+      window.unavailableSeatNumbers = '{{ unavailable_seat_numbers|escapejs }}'.replace(/[\[\]']/g,'').split(',').map(s => s.trim());
+      const studentInput = document.getElementById('studentTickets');
+      const adultInput = document.getElementById('adultTickets');
+      const seniorInput = document.getElementById('seniorTickets');
+      window.socialDistancing = {{ social_distancing|yesno:"true,false" }};
+
+      // Define a function to generate the seat grid
+      function generateSeatGrid(totalSeats, seatsPerRow) {
+        const rows = Math.ceil(totalSeats / seatsPerRow);
+        const cols = seatsPerRow;
+        const seatGrid = document.querySelector('.seat-grid');
+        for (let i = 0; i < rows; i++) {
+          const rowContainer = document.createElement('div');
+          rowContainer.className = 'row-container';
+          for (let j = 0; j < cols; j++) {
+            if (i * cols + j >= totalSeats) {
+              // Stop generating seats when the total number of seats is reached
+              break;
+            }
+            
+            const seat = document.createElement('button');
+            seat.className = 'seat';
+            seat.dataset.row = i + 1;
+            seat.dataset.col = j + 1;
+            seat.dataset.seatId = ''; 
+            seat.innerText = `${i + 1}${String.fromCharCode(65 + j)}`;
+
+            const seatNumber = seat.dataset.row + String.fromCharCode(64 + parseInt(seat.dataset.col, 10));
+
+            if (window.socialDistancing && (j % 2 == 0)) {
+              seat.classList.add('unavailable');
+              seat.disabled = true;
+              seat.style.backgroundColor = '#808080'; // Gray color for social distancing unavailable seats
+            } else if (window.unavailableSeatNumbers.includes(seatNumber)) {
+              seat.classList.add('unavailable');
+              seat.disabled = true;
+              seat.style.backgroundColor = '#ff3333'; // Red color for already selected seats
+            } else {
+              seat.addEventListener('click', toggleSeatSelection);
+            }
+
+            rowContainer.appendChild(seat);
+          }
+          seatGrid.appendChild(rowContainer);
+        }
+      }
+      
+      // Generate the seat grid
+      generateSeatGrid(window.screenSeats, 10);
+      
+      function updateSelectedCount() {
+        // Get all the selected seats
+        const selectedSeats = document.querySelectorAll('.seat.selected');
+                
+        // Update the value of the selected-seats input field
+        const selectedSeatsInput = document.getElementById('selected-seats');
+        selectedSeatsInput.value = Array.from(selectedSeats)
+          .map(seat => seat.dataset.row + String.fromCharCode(64 + parseInt(seat.dataset.col)))
+          .join(',');
+                
+        // Update the display of selected seats
+        displaySelectedSeats();
+      
+        // Update the total number of tickets in the HTML
+        const studentTickets = parseInt(studentInput.innerText, 10);
+        const adultTickets = parseInt(adultInput.innerText, 10);
+        const seniorTickets = parseInt(seniorInput.innerText, 10);
+        const totalTickets = studentTickets + adultTickets + seniorTickets;
+
+      }
+
+      // Define a function to toggle seat selection
+      function toggleSeatSelection(event) {
+        event.preventDefault();
+        let seat = event.target;
+      
+        // Ensure that the 'seat' variable refers to the button, not the text node
+        if (seat.nodeType === 3) {
+          seat = seat.parentNode;
+        }
+      
+        const selectedSeats = document.querySelectorAll('.seat.selected');
+        const totalSelectedSeats = selectedSeats.length;
+        const studentTickets = parseInt(studentInput.innerText, 10);
+        const adultTickets = parseInt(adultInput.innerText, 10);
+        const seniorTickets = parseInt(seniorInput.innerText, 10);
+        const totalTickets = studentTickets + adultTickets + seniorTickets;
+        const seatNumber = seat.dataset.row + String.fromCharCode(64 + parseInt(seat.dataset.col, 10));
+      
+        if (seat.classList.contains('unavailable')) {
+          // If the seat is unavailable, do not allow the user to select it
+          return;
+        }
+      
+        if (seat.classList.contains('selected')) {
+          // If the seat is already selected, allow the user to deselect it
+          seat.classList.remove('selected');
+          seat.dataset.seatId = '';
+          seat.style.backgroundColor = ''; // Reset the background color when deselected
+          updateSelectedCount();
+        } else {
+          // If the user has not exceeded the number of available seats based on their selected tickets
+          if (totalSelectedSeats < totalTickets) {
+            // Add the 'selected' class
+            seat.classList.add('selected');
+            // Set the 'data-seat-id' attribute to the ID of the corresponding Seat object
+            const seatId = seat.dataset.row + seat.dataset.col;
+            seat.dataset.seatId = seatId;
+            seat.style.backgroundColor = '#32CD32'; // Green color for user-selected seats
+            updateSelectedCount();
+          } else {
+            // If they have exceeded the limit, show an alert
+            alert('You have reached the maximum number of seats allowed.');
+          }
+        }
+      
+        // Disable the seat if it is unavailable
+        if (window.unavailableSeatNumbers.includes(seatNumber)) {
+          seat.disabled = true;
+        }
+      }
+      
+      function showSeatSelection() {
+        const studentTickets = parseInt(studentInput.value, 10);
+        const adultTickets = parseInt(adultInput.value, 10);
+        const seniorTickets = parseInt(seniorInput.value, 10);
+        const totalTickets = studentTickets + adultTickets + seniorTickets;
+    
+        if (totalTickets > 0) {
+          document.getElementById("seat-selection").style.display = "block";
+          document.querySelector('.tickets').style.display = "none";
+        } else {
+          alert("Please select at least one ticket.");
+        }
+      }
+    
+      const form = document.querySelector('form');
+
+      form.addEventListener('submit', event => {
+          const selectedSeatsInput = document.getElementById('selected-seats');
+          const selectedSeats = selectedSeatsInput.value;
+          const formData = new FormData(form);
+          formData.append('selected_seats', selectedSeats);
+          const xhr = new XMLHttpRequest();
+          xhr.open(form.method, form.action);
+          xhr.setRequestHeader('X-CSRFToken', getCookie('csrftoken'));
+          xhr.onreadystatechange = () => {
+              if (xhr.readyState === 4) {
+                  if (xhr.status === 200) {
+                     
+                  } else {
+                     
+                  }
+              }
+          };
+          xhr.send(formData);
+          event.preventDefault();
+      });
+    </script>
+
+      
+</div>
+{% endblock %}

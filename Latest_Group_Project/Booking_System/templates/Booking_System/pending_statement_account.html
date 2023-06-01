@@ -1,0 +1,52 @@
+{% extends "Booking_System/layout.html" %}
+{% block title %}
+Pending Statement Account Request
+{% endblock %}
+
+{% block content %}
+
+  {% if messages %}
+  <div class="messages">
+      {% for message in messages %}
+          <div class="alert {{ message.tags }}">
+              <span class="closebtn" onclick="this.parentElement.style.display='none';">&times;</span> 
+              <strong>{{ message }}</strong>
+          </div>
+      {% endfor %}
+  </div>
+  {% endif %}
+
+  <div class="container">
+      <h2>Pending Statement Account Request</h2>
+      <table class="table">
+          <thead>
+              <tr>
+                  <th>Username</th>
+                  <th>Card Holder Name</th>
+                  <th>Card Number</th>
+                  <th>Expiration Date</th>
+                  <th>CVV</th>
+                  <th>Action</th>
+              </tr>
+          </thead>
+          <tbody>
+            {% if statementaccountrequest %}
+                {% for payment in statementaccountrequest %}
+                    <tr>
+                        <td>{{ payment.user.username }}</td>
+                        <td>{{ payment.cardholder_name }}</td>
+                        <td>{{ payment.card_number }}</td>
+                        <td>{{ payment.expiration_month }} / {{payment.expiration_year }}</td>
+                        <td>{{ payment.cvv }}</td>
+                        <td>                 
+                            <a href="{% url 'finish_statement_request' payment.id %}" class="btn btn-success">Done</a>
+                        </td>
+                    </tr>
+                {% endfor %}
+            {% else %}
+                <td>You have currently no statement account request.</td>
+            {% endif %}
+          </tbody>
+      </table>
+  </div>
+{% endblock %}

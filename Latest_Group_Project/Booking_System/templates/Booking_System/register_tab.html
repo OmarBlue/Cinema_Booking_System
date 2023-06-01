@@ -1,0 +1,94 @@
+{% extends 'Booking_System/layout.html' %}
+{% block title %}
+Register
+{% endblock %}
+
+{% block content %}
+
+{% if messages %}
+<div class="messages">
+    {% for message in messages %}
+        <div class="alert {{ message.tags }}">
+            <span class="closebtn" onclick="this.parentElement.style.display='none';">&times;</span> 
+            <strong>{{ message }}</strong>
+        </div>
+    {% endfor %}
+</div>
+{% endif %}
+
+<div class="container">
+    <h1>Register</h1>
+    <div class="register-toggle text-center">
+        <button class="toggle-btn active d-inline-block" onclick="toggleRegister('student')">Student Register</button>
+        <button class="toggle-btn d-inline-block" onclick="toggleRegister('club', this)">Club Register</button>
+    </div>
+  
+    <div id="student-register">
+        <br>
+        <form method="post">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <div class="registrationFormAlert" id="PasswordMatch"></div>
+        <button class="enter_button" type="submit" name="student_submit">Register as Student</button>
+        </form>
+    </div>
+  
+    <div id="club-register" class="show-club-register" style="display:none;">
+        <form method="post">
+        {% csrf_token %}
+        <div class="row">
+            <div class="col field">
+            <h2>Club Information</h2>
+            {{ club_form.as_p }}
+            </div>
+            <div class="col field">
+            <h2>Address Information</h2>
+            {{ address_form.as_p }}
+            </div>
+        </div>
+        <div class="row">
+            <div class="col field">
+            <h2>Contact Information</h2>
+            {{ contact_form.as_p }}
+            </div>
+            <div class="col field">
+            <h2>Representative Information</h2>
+            {{ representative_form.as_p }}
+            </div>
+        </div>
+        <button class="enter_button" type="submit" name="club_submit">Register as Club</button>
+        </form>
+    </div>
+    </div>
+
+    <script>
+        function toggleRegister(type) {
+            const studentRegister = document.getElementById('student-register');
+            const clubRegister = document.getElementById('club-register');
+            const toggleButtons = document.getElementsByClassName('toggle-btn');
+    
+            if (type === 'student') {
+                studentRegister.style.display = 'block';
+                clubRegister.style.display = 'none';
+                toggleButtons[0].classList.add('active');
+                toggleButtons[1].classList.remove('active');
+            } else if (type === 'club') {
+                studentRegister.style.display = 'none';
+                clubRegister.style.display = 'block';
+                toggleButtons[0].classList.remove('active');
+                toggleButtons[1].classList.add('active');
+            }
+        }
+    
+        $(function() {
+            $("#id_password1, #id_password2").keyup(function() {
+                var password = $("#id_password1").val();
+                var match = password == $("#id_password2").val();
+                var message = match ? "Passwords match." : "Passwords do not match!";
+                var match_color = match ? "green" : "red";
+                $("#PasswordMatch").html(message).css("color", match_color);
+            });
+        });
+    </script>
+
+{% endblock %}

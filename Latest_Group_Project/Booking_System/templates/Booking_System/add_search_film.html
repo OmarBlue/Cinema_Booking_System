@@ -1,0 +1,10 @@
+{% extends 'Booking_System/layout.html' %}
+
+{% block content %}
+    <form method="GET" action="{% url 'search_film' %}">
+        <input type="text" name="query" placeholder="Search films..." value="{{ query }}" required>
+        <input type="submit" value="Search" class="btn btn-primary">
+    </form>
+
+    <button class="enter_button" type="submit" onclick="location.href='{% url 'add_film' %}'">Add Film</button>
+{% endblock %}

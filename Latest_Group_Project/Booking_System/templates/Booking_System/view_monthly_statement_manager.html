@@ -1,0 +1,61 @@
+{% extends 'Booking_System/layout.html' %}
+
+{% block title %}
+Monthly Transactions
+{% endblock %}
+
+{% block content %}
+    <div class="container">
+        <h1>Select a month</h1>
+        <form method="POST" action="{% url 'view_monthly_statement_manager' account_id=account.pk %}" id="month-select-form">
+            {% csrf_token %}
+            <label for="selected_month">Select a month:</label>
+            <select name="selected_month" id="selected_month">
+                <option value="01">January</option>
+                <option value="02">February</option>
+                <option value="03">March</option>
+                <option value="04">April</option>
+                <option value="05">May</option>
+                <option value="06">June</option>
+                <option value="07">July</option>
+                <option value="08">August</option>
+                <option value="09">September</option>
+                <option value="10">October</option>
+                <option value="11">November</option>
+                <option value="12">December</option>
+            </select>
+            
+            <button class="small-statement-button" type="submit">View Monthly Statement</button>
+        </form>
+        <br>
+        <h1>{{ month }} Account Statement for {{ account.account_holder_name }} </h1>
+        <table class="table">
+            <thead>
+            <tr>
+                <th>Date</th>
+                <th>Film Booked</th>
+                <th>Ticket Quantity</th>
+                <th>Amount</th>
+                <th>Credit Balance</th>
+            </tr>
+            </thead>
+            <tbody>
+            {% for statement in statement_list %}
+                <tr>
+                <td>{{ statement.statement_date }}</td>
+                <td>{{ statement.film_name }}</td>
+                <td>{{ statement.ticket_quantity }}</td>
+                <td{% if statement.transaction_type == 'C' %} style="color: green;"{% else %} style="color: red;"{% endif %}>
+                {% if statement.transaction_type == 'C' %}+{% else %}-{% endif %} £{{ statement.amount }}
+                </td>
+                <td> £ {{ statement.credit_balance }}</td>
+                </tr>
+            {% empty %}
+                <tr>
+                <td colspan="5">No statement found for {{ month }}</td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+{% endblock %}

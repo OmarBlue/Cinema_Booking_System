@@ -1,0 +1,30 @@
+{% extends "Booking_System/layout.html" %}
+{% block title %}
+Payment
+{% endblock %}
+
+{% block content %}
+    {% if messages %}
+        <div class="messages">
+            {% for message in messages %}
+                <div class="alert {{ message.tags }}">
+                    <span class="closebtn" onclick="this.parentElement.style.display='none';">&times;</span> 
+                    <strong>{{ message }}</strong>
+                </div>
+            {% endfor %}
+        </div>
+    {% endif %}
+
+
+        <div class="topup-container">
+            <h2>Top Up Credits</h2>
+            <form method="post">
+            {% csrf_token %}
+            <h4>Choose a top-up amount:</h4>
+            {% for amount in amounts %}
+                <button type="submit" name="topup_amount" value="{{ amount }}" class="topup-button">£{{ amount }}</button>
+            {% endfor %}
+            </form>
+        </div>
+
+{% endblock %}

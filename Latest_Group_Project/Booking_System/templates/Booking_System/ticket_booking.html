@@ -1,0 +1,111 @@
+{% extends "Booking_System/layout.html" %}
+{% block title %}
+Payment
+{% endblock %}
+
+{% block content %}
+
+<div class="tickets-container">
+  <div class="tickets">
+    <h1>Select Tickets:</strong></h1>
+    <p><strong>Film Title:</strong>  {{ film.title }}</p>
+    <p><strong>Selected showtime:</strong>  {{ show_time.start_time|date:"l, F j, Y, P" }}</p>
+    <p><strong>Screen:</strong>  {{ show_time.screen.screen_number }}</p>
+    <p><strong>Total cost:</strong> £ <span id="total-cost">0.00</span></p>
+    <form method="POST" action="{% url 'confirm_booking' %}">
+        {% csrf_token %}
+
+
+        <div class="quantity"  >
+          <label>Student:</label>
+          <div class="input-group">
+              <button type="button" id="studentMinus" class="btn minus-btn" data-type="student" onclick="decrementValue('student')">-</button>
+              <input type="number" id="studentTickets" name="student" value="0" min="{% if request.user.user_type == 4 %}10{% else %}0{% endif %}" max="100" oninput="this.value=this.value.replace(/[^0-9]/g,'');" />
+              <button type="button" id="studentPlus" class="btn plus-btn" data-type="student" onclick="incrementValue('student')">+</button>
+          </div>
+        </div>
+  
+        <div class="quantity" {% if is_club_rep %}style="display:none"{% endif %}>
+            <label>Adult:</label>
+            <div class="input-group">
+                <button type="button" id="adultMinus" class="btn minus-btn" data-type="adult" onclick="decrementValue('adult')">-</button>
+                <input type="number" id="adultTickets" name="adults" value="0" min="0" max="100" oninput="this.value=this.value.replace(/[^0-9]/g,'');" />
+                <button type="button" id="adultPlus" class="btn plus-btn" data-type="adult" onclick="incrementValue('adult')">+</button>
+            </div>
+        </div>
+        <div class="quantity" {% if is_club_rep %}style="display:none"{% endif %}>
+            <label>Senior:</label>
+            <div class="input-group">
+                <button type="button" id="seniorMinus" class="btn minus-btn" data-type="senior" onclick="decrementValue('senior')">-</button>
+                <input type="number" id="seniorTickets" name="senior" value="0" min="0" max="100" oninput="this.value=this.value.replace(/[^0-9]/g,'');" />
+                <button type="button" id="seniorPlus" class="btn plus-btn" data-type="senior" onclick="incrementValue('senior')">+</button>
+            </div>
+        </div>
+
+        <br>
+        <input type="hidden" name="showtime_id" value="{{ show_time.id }}">
+  
+        <button type="submit" class="btn btn-primary">Confirm Tickets</button>
+    </form>
+  </div>
+  
+    <br>
+
+    {% if messages %}
+    <div class="messages">
+        {% for message in messages %}
+        {% if message.tags %}
+            <div class="{% if message.tags == 'error' %}alert alert-danger{% elif message.tags == 'success' %}alert alert-success{% endif %}">
+            {{ message }}
+            </div>
+        {% endif %}
+        {% endfor %}
+    </div>
+    {% endif %}
+
+    <script>
+        // Get the student, adult and senior input fields and buttons
+        const studentInput = document.getElementById('studentTickets');
+        const adultInput = document.getElementById('adultTickets');
+        const seniorInput = document.getElementById('seniorTickets');
+        const studentMinusButton = document.getElementById('studentMinus');
+        const studentPlusButton = document.getElementById('studentPlus');
+        const adultMinusButton = document.getElementById('adultMinus');
+        const adultPlusButton = document.getElementById('adultPlus');
+        const seniorMinusButton = document.getElementById('seniorMinus');
+        const seniorPlusButton = document.getElementById('seniorPlus');
+      
+        function incrementValue(id) {
+          const input = document.getElementById(`${id}Tickets`);
+          input.value++;
+          updateTotalCost();
+        }
+        
+        function decrementValue(id) {
+          const input = document.getElementById(`${id}Tickets`);
+          if (input.value > 0) {
+            input.value--;
+            updateTotalCost();
+          }
+        }
+
+        function updateTotalCost() {
+          const adultTickets = parseInt(document.getElementById('adultTickets').value);
+          const studentTickets = parseInt(document.getElementById('studentTickets').value);
+          const seniorTickets = parseInt(document.getElementById('seniorTickets').value);
+          const costPerAdultTicket = 10;
+          const costPerstudentTicket = 5;
+          const costPerSeniorTicket = 7;
+          const totalCost = (adultTickets * costPerAdultTicket) + (studentTickets * costPerstudentTicket) + (seniorTickets * costPerSeniorTicket);
+          document.getElementById('total-cost').innerHTML = totalCost.toFixed(1);
+        }
+    
+        // Add event listeners to the input fields
+        document.getElementById('studentTickets').addEventListener('input', updateTotalCost);
+        document.getElementById('adultTickets').addEventListener('input', updateTotalCost);
+        document.getElementById('seniorTickets').addEventListener('input', updateTotalCost);
+        
+      </script>
+ 
+</div>
+{% endblock %}

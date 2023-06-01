@@ -1,0 +1,50 @@
+{% extends "Booking_System/layout.html" %}
+{% block title %}
+Manage Film
+{% endblock %}
+
+{% block content %}
+    {% if messages %}
+    <div class="messages">
+        {% for message in messages %}
+            <div class="alert {{ message.tags }}">
+                <span class="closebtn" onclick="this.parentElement.style.display='none';">&times;</span> 
+                <strong>{{ message }}</strong>
+            </div>
+        {% endfor %}
+    </div>
+    {% endif %}
+    
+    <div class="container">
+        <h2>Add Show Time</h2>
+        <form method="post">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button class="enter_button" type="submit">Add Show Time</button>
+        </form>
+        <form method="post" action="{% url 'delete_finished_showtimes' %}">
+            {% csrf_token %}
+            <button type="submit" class="cancel_button">Delete Finished Showtimes</button>
+        </form>
+
+        <h2>Show Times</h2>
+        <table class="table table-striped">
+        <thead>
+            <tr>
+            <th>Film Schedule</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>
+                    {% for showtime in showtimes %}
+                        <p>{{ showtime.film.title }} : Starting: {{ showtime.start_time }} to {{ showtime.end_time }} in Screen {{ showtime.screen.screen_number }} </p>
+                    {% endfor %}
+                </td>
+            </tr>
+        </tbody>
+        </table>
+    </div>
+{% endblock %}
+
+

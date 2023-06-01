@@ -1,0 +1,54 @@
+{% extends 'Booking_System/layout.html' %}
+{% block title %}
+Booking Receipt
+{% endblock %}
+
+{% block content %}
+
+    <div class="receipt-container">
+        <h1>Booking Receipt</h1>
+        <br>
+        <div class="receipt-details">
+            <img class="receipt-image" src="{{ booking.showtime.film.image.url }}" alt="{{ booking.showtime.film.title }} Image">
+            <div class="title-and-screen">
+                <h2><strong> {{ booking.showtime.film.title }}</strong></h2>
+                <h3><strong>Age Rating:</strong> {{ booking.showtime.film.age_rating }}</h3>
+                <h3><strong>Screen:</strong> {{ booking.screen.screen_number }}</h3>
+                <h3><strong>Showing:</strong> {{ booking.showtime.start_time|date:"n/j/Y, P" }}</h3>
+            </div>
+        </div>
+
+        <br>
+        
+        <p><strong>Tickets:</strong></p>
+        <ul class="no-bullet-points">
+        <li>Adults: {{ booking.adult_tickets }}</li>
+        <li>Students: {{ booking.student_tickets }}</li>
+        <li>Seniors: {{ booking.senior_tickets }}</li>
+        </ul>
+
+        <p><strong>Seats:</strong></p>
+        <ul class="no-bullet-points">
+            
+                <li>Seat No: {% for seat in seats %}<strong>{{ seat }}, </strong>{% endfor %}</li>
+            
+        </ul>
+
+        <br>
+        {% with account=request.user.get_account %}
+                                  
+            <p>Discount:<strong> {{ account.discount_rate|floatformat:"-0" }}%</strong></p>
+                                     
+        {% endwith %}
+        <p>Total Amount: <strong>£{{ booking.amount }}</strong></p>
+        
+        <br>
+        <br>
+
+        <a href="{% url 'home' %}">
+            <button class="enter_button" type="button">Done</button>
+        </a>
+
+    </div>
+
+{% endblock %}
